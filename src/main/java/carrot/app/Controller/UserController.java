@@ -22,6 +22,7 @@ public class UserController {
 
  //local:8080/hello치면 이거 나옴
     @GetMapping("hello")
+    @ResponseBody
     public String hello(Model model){
         model.addAttribute("data", "hello!");
         return "test";
@@ -32,6 +33,7 @@ public class UserController {
      * @return
      */
     @RequestMapping("/login")
+    @ResponseBody
     public String login(Model model){
         return "login.html";
     }
@@ -41,6 +43,7 @@ public class UserController {
      * @return
      */
    @RequestMapping("/access_denied")
+    @ResponseBody
     public String accessDenied() {
         return "asset_denied.html";
    }
@@ -52,6 +55,7 @@ public class UserController {
 //     * @return
 //     */
     @RequestMapping("/user_access")
+    @ResponseBody
     public String userAccess(Model model, Authentication authentication) {
         //Authentication 객체를 통해 유저 정보를 가져올 수 있다.
         UserVo userVo = (UserVo) authentication.getPrincipal();  //userDetail 객체를 가져옴
@@ -60,6 +64,7 @@ public class UserController {
     }
     //내가 임시로 만들어 놓은 회원가입
     @GetMapping("/signUp")
+    @ResponseBody
     public String signUpForm() {
         return "signup";
     }
