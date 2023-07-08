@@ -71,10 +71,11 @@ public class UserController {
     }
 
     @PostMapping("/signUp")
-    public String signUp(UserVo userVo) {
+    @ResponseBody
+    public UserVo signUp(@RequestBody UserVo userVo) {
         userService.joinUser(userVo);
         System.out.println(userVo);
-        return "login";
+        return userVo;
     }
 
     @GetMapping("/user-nickname-count")
