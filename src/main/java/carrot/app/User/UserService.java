@@ -24,6 +24,7 @@ public class UserService implements UserDetailsService{
     @Autowired
     private final UserMapper userMapper;
 
+
     @Transactional
     public void joinUser(UserVo userVo){
         System.out.println(userVo);
@@ -38,6 +39,7 @@ public class UserService implements UserDetailsService{
     //인자를 무조건 username으로 설절해야됨
     public UserVo loadUserByUsername(String username) throws UsernameNotFoundException {
         UserVo userVo = userMapper.getUserAccount(username);
+        System.out.println(userVo);
         if (userVo == null){
             //System.out.println(userVo);
             throw new UsernameNotFoundException("User not authorized.");
@@ -45,4 +47,12 @@ public class UserService implements UserDetailsService{
         return userVo;
     }
 
+    public int countUserByUserNickname(String unick) {
+
+        return userMapper.countUserByNickname(unick);
+    }
+    public int countUserByUserEmail(String uemail) {
+
+        return userMapper.countUserByEmail(uemail);
+    }
 }

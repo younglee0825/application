@@ -11,4 +11,20 @@
         (unum, uemail, upwd, uname, uphone, unick)
         VALUES (#{unum}, #{uemail}, #{upwd}, #{uname}, #{uphone}, #{unick})
     </insert>
+    <select id="countUserByNickname" parameterType="string" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        account
+        WHERE
+        unick = #{value}
+    </select>
+    <select id="countUserByEmail" parameterType="string" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        account
+        WHERE
+        uemail = #{value}
+    </select>
 </mapper>

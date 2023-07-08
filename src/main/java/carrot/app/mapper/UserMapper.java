@@ -7,4 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
     UserVo getUserAccount(String username);
     void saveUser(UserVo userVo);
+    int countUserByNickname(String unick);
+    int countUserByEmail(String uemail);
 }

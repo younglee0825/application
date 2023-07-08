@@ -5,5 +5,8 @@
   <title>index</title>
 </head>
 <body>
-<h2>로그인 실패 ㅗ</h2>
+<div th:if="error">
+  <p id="valid" style="color: red; font-size:12px;"><a th:text="${exception}"></a></p>
+</div>
 </body>
+</html>
