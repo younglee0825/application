@@ -1,9 +1,11 @@
 package carrot.app.Controller;
 
+import carrot.app.Exception.UserException;
 import carrot.app.User.User;
 import carrot.app.User.UserService;
 import carrot.app.User.UserVo;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.Principal;
 
 @Controller
@@ -72,10 +75,16 @@ public class UserController {
 
     @PostMapping("/signUp")
     @ResponseBody
-    public UserVo signUp(@RequestBody UserVo userVo) {
-        userService.joinUser(userVo);
-        System.out.println(userVo);
-        return userVo;
+    public UserVo signUp(UserVo userVo, @RequestParam("upwd") String upwd, @RequestParam("upwd2") String upwd2) throws Exception {
+       //userPassword & userPassword2 check logic
+       if(upwd.equals(upwd2)){
+           userService.joinUser(userVo);
+           System.out.println(userVo);
+
+           return userVo;
+       }else{
+           throw new UserException("비밀번호가 일치하지 않습니다.");
+       }
     }
 
     @GetMapping("/user-nickname-count")
