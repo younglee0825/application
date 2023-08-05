@@ -1,0 +1,25 @@
+<!doctype html>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div class ="layout">
+    <table>
+        <tr th:each = "content:${list}">
+            <td th:src =${content.img}"></td>
+            <td>
+                <a th:text="${content.title" th:href="@{/content/view(id=${content.id})}"></a>
+            </td>
+        </tr>
+    </table>
+    <th:block th:each="page:${#numbers.sequence(startPage,endPage)}">
+        <a th:if="${page != nowPage}" th:href="@{/board/list(page=${page-1})}" th:text ="${page}"></a>
+        <strong th:if="${page==nowPage}" th:text ="${page}" style="color:red"></strong>
+
+    </th:block>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+</body>
+</html>
