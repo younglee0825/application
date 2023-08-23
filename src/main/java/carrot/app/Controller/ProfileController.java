@@ -1,30 +1,21 @@
 package carrot.app.Controller;
 
-import carrot.app.Exception.UserException;
 import carrot.app.Profile.ProfileService;
 import carrot.app.Profile.ProfileVo;
-import carrot.app.User.User;
 import carrot.app.User.UserService;
 import carrot.app.User.UserVo;
+import carrot.app.mapper.MapMapper;
 import carrot.app.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,6 +25,7 @@ public class ProfileController {
     private ProfileService profileService;
     private UserService userService;
     private final UserMapper userMapper;
+    private MapMapper mapMapper;
 
 
     @GetMapping("/mypage")
@@ -48,6 +40,7 @@ public class ProfileController {
 
             String profileImageUrl = profileService.getProfileImageUrl(profileVo.getUser_num());
             System.out.println(profileImageUrl);
+
 
             model.addAttribute("nickname", userVo.getUnick() + "님"); //유저 아이디
             model.addAttribute("goal", profileVo.getGoal());

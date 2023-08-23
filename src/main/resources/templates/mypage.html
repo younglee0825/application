@@ -4,6 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <title>MyPage</title>
+    <style>
+  .calendar {
+    font-family: Arial, sans-serif;
+    border-collapse: collapse;
+    width: 60%;
+    margin:auto;
+  }
+
+  .calendar th, .calendar td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+  }
+
+  .calendar th {
+    background-color: #f2f2f2;
+  }
+
+  .calendar td:hover {
+    background-color: #f2f2f2;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 <div class="container">
@@ -16,10 +39,27 @@
 </div>
 <div class="container">
     <h3>플로깅 기록</h3>
-    <h6>여기에 달력으로 플로깅 기록 관련 내용 들어갈 예정임</h6>
-    <h5>거리 : </h5>
-    <h5>시간 : </h5>
-    <h5>칼로리 : </h5>
+    <table class="calendar">
+        <thead>
+        <tr>
+            <th id="calendarMonth" colspan="7">August 2023</th>
+        </tr>
+        <tr>
+            <th>Sun</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+        </tr>
+        </thead>
+        <tbody id="calendar-body">
+        </tbody>
+    </table>
+    <h5>거리 : <span id="distance"></span></h5>
+    <h5>시간 : <span id="time"></span></h5>
+    <h5>칼로리 : <span id="calories"></span></h5>
 </div>
 <div class="container">
     <h5><a href="mypage/content">내가 작성한 게시물</a></h5>
@@ -27,9 +67,78 @@
     <h5><a href="mypage/part">내가 참여한 모집글</a></h5>
     <h5><a href="/mypage/editPro">프로필 관리</a></h5>
     <h5><a href="/logout">로그아웃</a></h5>
-
-
-<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script>
+      function generateCalendar(year, month) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const calendarBody = document.getElementById("calendar-body");
+        const calendarMonth = document.getElementById("calendarMonth");
+        calendarBody.innerHTML = "";
+        calendarMonth.textContent = `${getMonthName(month)} ${year}`;
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement("tr");
+            for (let j = 0; j < 7; j++) {
+                const cell = document.createElement("td");
+                if (i === 0 && j < firstDay) {
+                    cell.textContent = "";
+                } else if (date > daysInMonth) {
+                    break;
+                } else {
+                    cell.textContent = date;
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+            calendarBody.appendChild(row);
+        }
+    }
+
+    function getMonthName(month) {
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        return monthNames[month];
+    }
+
+function fetchDataForDate(year, month, day) {
+    // AJAX 요청을 통해 선택한 날짜에 해당하는 데이터를 서버로부터 가져오는 함수입니다.
+    $.ajax({
+        type: "GET",
+        url: "/map/fetchDataForDate", // 데이터를 가져올 서버의 엔드포인트
+        data: { year: year, month: month, day: day }, // 선택한 연도, 월, 날짜를 서버로 전달
+        success: function(data) {
+            // 서버로부터 받아온 데이터를 출력하는 로직을 여기에 작성
+            //$("#distance").text(data.distance);
+            //$("#time").text(data.time);
+            //$("#calories").text(data.calories);
+            console.log("Success");
+        },
+        error: function(error) {
+            console.error("Error fetching data:", error);
+        }
+    });
+}
+
+$(document).ready(function() {
+    const currentDate = new Date();
+    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+
+    // 달력의 날짜를 클릭했을 때의 동작을 설정
+    $(document).on("click", ".calendar td", function() {
+        const selectedYear = currentDate.getFullYear();
+        const selectedMonth = currentDate.getMonth()+1;
+        const selectedDate = $(this).text();
+        fetchDataForDate(selectedYear, selectedMonth, selectedDate);
+    });
+});
+
+</script>
 </body>
 </html>
