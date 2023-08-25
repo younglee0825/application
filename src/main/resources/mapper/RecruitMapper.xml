@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="carrot.app.mapper.RecruitMapper">
+	<select id="recruitList" parameterType="hashmap" resultType="carrot.app.dto.RecruitDTO">
+	SELECT r.*
+	  FROM (SELECT r.rnum
+	             , r.image_data                          AS imageData
+	             , r.rtitle
+	             , r.rtext
+	             , r.rcount
+	             , date_format(r.rdatetime, '%c월 %d일') AS rdate
+	             , r.sigungu
+	             , a.unick                               AS userNick
+	             , r.rloc
+	             , case when now() <![CDATA[ < ]]> r.rdatetime
+	                    and r.rcount <![CDATA[ > ]]> (select count(*) 
+	                                      from rjoin
+	                                     where recruit_rnum = r.rnum)
+	                    then '모집중'
+	                    else '모집마감'
+	               end                                   AS status
+	             , (select count(*)
+	                  from scrap s
+	                 where s.recruit_rnum = r.rnum
+	                   and s.user_num = 1)               AS scrapCount
+	             , r.user_num
+	          FROM recruit as r
+	             , account a
+	         WHERE r.user_num = a.unum
+	        ORDER BY r.rnum desc
+	       ) AS r
+	 WHERE 1 = 1
+	<if test = "searchword neq null and searchwrod neq ''">
+	   AND (r.rtitle like concat('%', #{searchword}, '%') 
+	        or r.rtext like concat('%', #{searchword}, '%')
+	        or r.rloc like concat('%', #{searchword}, '%')
+	       )
+	</if>
+	<if test="category eq 'recruit'.toString()">
+	   AND r.status = '모집중'
+	</if>
+	<if test="category eq 'scrap'.toString()">
+	   AND r.scrapCount > 0
+	</if>
+	</select>
+
+	<select id="selectRecruit" parameterType="carrot.app.dto.RecruitDTO" resultType="carrot.app.dto.RecruitDTO">
+	<![CDATA[
+	SELECT r.rnum
+	     , r.rphoto
+	     , r.image_data                          as imageData
+	     , r.rtitle
+	     , r.rtext
+	     , r.rcount
+	     , date_format(r.rdatetime, '%c월 %d일') as rdatetime
+	     , date_format(r.rdatetime, '%Y-%m-%d')  as rdate
+	     , date_format(r.rdatetime, '%H:%i')     as rtime
+	     , r.rloc
+	     , r.radrs
+	     , r.etc
+	     , a.unick                               as userNick
+	     , r.user_num                            as userNum
+	     , (select count(*)
+	          from rjoin
+	         where recruit_rnum = r.rnum)        as joinCount
+	     , CASE DAYOFWEEK(r.rdatetime)
+	            WHEN '1' THEN '일요일'
+	            WHEN '2' THEN '월요일'
+	            WHEN '3' THEN '화요일'
+	            WHEN '4' THEN '수요일'
+	            WHEN '5' THEN '목요일'
+	            WHEN '6' THEN '금요일'
+	            WHEN '7' THEN '토요일'
+	       END                                  as week
+	     , (select profile
+	          from myPage
+	         where user_num = a.unum)           as profile
+	     , case when now() < r.rdatetime
+	                 and r.rcount > (select count(*)
+	                                   from rjoin
+	                                  where recruit_rnum = r.rnum)
+	            then '모집중'
+	            else '모집마감'
+	       end                                   as status
+	  FROM recruit as r
+	     , account as a
+	 WHERE r.user_num = a.unum
+	   AND r.rnum = #{rnum}
+	]]>
+	</select>
+
+	<insert id="addRecruit" parameterType="carrot.app.dto.RecruitDTO">
+	INSERT
+	  INTO recruit(rphoto
+	             , image_data
+	             , rtitle
+	             , rtext
+	             , rdatetime
+	             , rcount
+	             , rloc
+	             , radrs
+	             , etc
+	             , sigungu
+	             , user_num
+	              ) VALUES (
+	               #{rphotos}
+	             , #{imageData}
+	             , #{rtitle}
+	             , #{rtext}
+	             , str_to_date(concat(#{rdate}, #{rtime}), '%Y-%m-%d%H:%i')
+	             , #{rcount}
+	             , #{rloc}
+	             , #{radrs}
+	             , #{etc}
+	             , #{sigungu}
+	             , #{userNum}
+	              )
+	</insert>
+	
+	<update id="updateRecruit" parameterType="carrot.app.dto.RecruitDTO">
+	UPDATE recruit
+	   SET rtitle     = #{rtitle}
+	     , rtext      = #{rtext}
+	<if test="filesize > 0">
+	     , rphoto     = #{rphotos}
+	     , image_data = #{imageData}
+	</if>
+	     , rdatetime  = str_to_date(concat(#{rdate}, #{rtime}), '%Y-%m-%d%H:%i')
+	     , rcount     = #{rcount}
+	     , rloc       = #{rloc}
+	     , radrs      = #{radrs}
+	     , etc        = #{etc}
+	     , sigungu    = #{sigungu}
+	     , user_num   = #{userNum}
+	 WHERE rnum       = #{rnum}
+	   AND user_num   = #{userNum}
+	</update>
+	
+	<delete id="deleteRecruit" parameterType="carrot.app.dto.RecruitDTO">
+	DELETE FROM recruit
+	 WHERE rnum = #{rnum}
+	   AND user_num = #{userNum}
+	</delete>
+	
+	<select id="countJoin" parameterType="carrot.app.dto.RecruitDTO" resultType="int">
+	select count(*)
+	  from rjoin
+ 	 where recruit_rnum = #{rnum}
+	  and user_num      = #{userNum}
+	</select>
+	
+	<select id="countRecruitJoin" parameterType="carrot.app.dto.RecruitDTO" resultType="int">
+	select count(*)
+	  from rjoin
+ 	 where recruit_rnum = #{rnum}
+	</select>
+	
+	<insert id="insertJoin" parameterType="carrot.app.dto.RecruitDTO">
+	INSERT
+	  INTO rjoin(user_num, recruit_rnum)
+	      values(#{userNum}, #{rnum})
+	</insert>
+	
+	<select id="countScrap" parameterType="carrot.app.dto.RecruitDTO" resultType="int">
+	SELECT count(*)
+	  FROM scrap
+	 WHERE recruit_rnum = #{rnum}
+	   AND user_num = #{userNum}
+	</select>
+
+	<insert id="insertScrap" parameterType="carrot.app.dto.RecruitDTO">
+	INSERT
+	  INTO scrap (user_num, recruit_rnum)
+	  VALUES (#{userNum}, #{rnum})
+	</insert>
+</mapper>

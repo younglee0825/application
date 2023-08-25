@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="carrot.app.mapper.UserMapper">
+    <select id="getUserAccount" parameterType="String" resultType="carrot.app.User.UserVo">
+        SELECT * FROM account
+        WHERE uemail = #{username}
+    </select>
+    <insert id="saveUser" parameterType="carrot.app.User.UserVo">
+        INSERT INTO account
+        (unum, uemail, upwd, uname, uphone, unick)
+        VALUES (#{unum}, #{uemail}, #{upwd}, #{uname}, #{uphone}, #{unick})
+    </insert>
+    <select id="countUserByNickname" parameterType="string" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        account
+        WHERE
+        unick = #{value}
+    </select>
+    <select id="countUserByEmail" parameterType="string" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        account
+        WHERE
+        uemail = #{value}
+    </select>
+</mapper>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>게시판 목록</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+	<style>
+	.postlist img.post_image {
+		width:300px;
+		height:250px;
+	}
+	.profile-desc {
+		position:relative;
+		float:left;
+		margin-left:10px;
+	}
+
+	.profile-desc p {
+		margin-top:5px;
+	}
+
+	.cl {
+		clear:both;
+	}
+
+	.profile-user-img{
+		position:relative;
+		float:left;
+		width: 50px;
+		height: 50px;
+		border-radius: 70px;
+		overflow: hidden;
+	}
+
+	.profile-user-img-img{
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.like-comment {
+		margin-top:5px;
+	}
+	
+	.like-btn, .comment-btn {
+		text-decoration:none;
+	}
+
+	.modal {
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: none;
+		background-color: rgba(0, 0, 0, 0.4);
+	}
+
+	.modal.show {
+		display: block;
+	}
+
+	.modal_body {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 200px;
+		height: 200px;
+		padding: 40px;
+		text-align: center;
+		background-color: rgb(255, 255, 255);
+		border-radius: 10px;
+		box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+		transform: translateX(-50%) translateY(-50%);
+	}
+
+	.btn-open-popup{
+		width: 20px;
+		height: 20px;
+		border-radius: 70px;
+		overflow: hidden;
+		float: right;
+		margin: 0 50px 50px 0;
+	}
+
+	.btn-open-popup-img{
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.text{
+		text-decoration: none;
+		cursor:pointer;
+	}
+
+	</style>
+	<script th:inline="javascript">
+		let unum = /*[[${userVo.unum}]]*/'';
+		$(document).on("click", ".like-btn", function() {
+			let pnum = $(this).closest(".postlist").find(":hidden[name=pnum]").val();
+			let _this = $(this);
+			$.ajax({
+				async:false,
+				url:"/post/addlikes",
+				type:"post",
+				data:{"pnum":pnum},
+				success:function(data) {
+					console.log(data);
+					let result = Number(data.result);
+					if (data.result > 0) {
+						console.log($(_this).get(0));
+						console.log("result : ", result);
+						alert("좋아요 되었습니다.");
+						$(_this).next(".like-count").text(result);
+					} else if (result == -1) {
+						alert("이미 좋아요를 클릭한 글입니다.");
+					}
+				},
+				error:function(xhr, status, res) {
+					console.log(xhr.responseText, status, res);
+				}
+			})
+			console.log("좋아요 클릭");
+			return false;
+		});
+
+		$(document).on("click", "a.modal-popup", function() {
+			// console.log("모달 팝업 클릭됨");
+			let pnum = $(this).closest(".btn-open-popup").find(":hidden[name=pnum]").val();
+			let user_num = $(this).closest(".btn-open-popup").find(":hidden[name=user_num]").val();
+			$("#pnum").val(pnum);
+			$("#user_num").val(user_num);
+			$("#modal").addClass("show");
+			$("body").css("overflow", "hidden");
+			return false;
+		});
+
+		$(document).on("click", "#modify", function() {
+			let user_num = $("#user_num").val();
+			// console.log("modify unum :", unum, ", user_num :", user_num);
+			if (unum == user_num) {
+				if (isMyPost()) {
+					submitForm("postModify");
+				}
+			} else {
+				alert("본인이 작성한 글만 수정 가능합니다.");
+			}
+
+			return false;
+		});
+
+
+		$(document).on("click", "#delete", function() {
+			let user_num = $("#user_num").val();
+			// console.log("delete unum :", unum, ", user_num :", user_num);
+			if (unum == user_num) {
+				if (isMyPost()) {
+					submitForm("postDelete");
+				}
+			} else {
+				alert("본인이 작성한 글만 삭제 가능합니다.");
+			}
+
+			return false;
+		});
+
+		$(document).on("click", "#cancel", function() {
+			$("#modal").removeClass("show");
+			$("body").css("overflow", "auto");
+
+			return false;
+		});
+
+		function isMyPost() {
+			let result = 0;
+			let pnum = $("#pnum").val();
+			$.ajax({
+				async:false,
+				url:"/post/ismypost",
+				type:"post",
+				data:{"pnum":pnum},
+				dataType:"json",
+				success:function(data) {
+					result = Number(data.result);
+				},
+				error:function(xhr, status, res) {
+					console.log(xhr.responseText, status, res);
+				}
+			});
+
+			return result == 1;
+		}
+		
+		function submitForm(action) {
+			let pnum = $("#pnum").val();
+			let form = $("<form>", {method:"post", action:`/post/${action}`});
+			$(form).append($("<input>", {type:"hidden", name:"pnum", value:pnum}));
+			$("body").append(form);
+			form.submit();
+		}
+	</script>
+<body>
+<div class="container">
+	<div id="modal" class="modal">
+		<input type="hidden" id="pnum" />
+		<input type="hidden" id="user_num" />
+		<div class="modal_body">
+			<a id="delete" class="text">삭제</a><br/><hr/>
+			<a id="modify" class="text">수정</a><br/><hr/>
+			<a id="cancel" class="text">취소</a>
+		</div>
+	</div>
+	<h2>게시판 목록</h2>
+	<th:block th:if="${postList != null}">
+		<th:block th:each="post : ${postList}">
+			<div class="post-group">
+				<div class="form-group">
+					<div class="profile-group">
+						<div class="profile-user-img">
+							<img th:src="@{/post/profileImage/{pnum}(pnum=${post.pnum})}" />
+						</div>
+						<div class="profile-desc">
+						<h5>
+							<b th:text="${post.user_nick}"></b>
+							<p th:text="${post.pdatetime}"></p>
+						</h5>
+						</div>
+					</div>
+				<div class="cl"></div>
+				<div class="postlist">
+					<div class="form-group">
+						<div class="btn-open-popup">
+							<input type="hidden" name="pnum" th:value="${post.pnum}" />
+							<input type="hidden" name="user_num" th:value="${post.user_num}" />
+							<a href="#" class="modal-popup">
+								<img src="/images/three_dot.png" alt="profile" class="btn-open-popup-img" />
+							</a>
+						</div>
+					</div>
+					<h5>
+						<a th:href="@{/post/postcomment/{pnum}(pnum=${post.pnum})}" th:text="${post.ptext}"></a>
+					</h5>
+					<th:block th:if="${post.filesize > 0}">
+						<a th:href="@{/post/postcomment/{pnum}(pnum=${post.pnum})}">
+							<img class="post_image" th:src="@{/post/viewImage/{pnum}(pnum=${post.pnum})}" />
+						</a>
+					</th:block>
+					<div class="like-comment">
+						<a href="" class="like-btn">🌳</a>
+						<span class="like-count" th:text="${post.likecnt}"></span>
+						<a th:href="@{/post/postcomment/{pnum}(pnum=${post.pnum})}" class="comment-btn">✏️</a>
+						<span class="comment-count" th:text="${post.commentcnt}"></span>
+					</div>
+				</div>
+				<hr />
+			</div>
+		</th:block>
+	</th:block>
+	<button type="button" class="btn btn-default" onclick="location.href='/post/postform'">글쓰기</button>
+</div>
+</body>
+</html>

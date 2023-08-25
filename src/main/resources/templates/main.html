@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>홈화면</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+<body>
+<div class="container">
+    <h2>홈화면</h2>
+    <h2>
+		<p th:text="|로그인 된 사용자 : ${principal}|"></p>
+    </h2>
+    <form action="write.jsp" method="post">
+        <div class="form-group">
+            <span>
+                <a href="main">홈화면 </a> |
+            </span>
+            <span>
+                <a href="post/postlist">게시판 </a> |
+            </span>
+            <span>
+                <a href="recruit/recruitlist">모집게시판 </a> |
+            </span>
+            <span>
+                <a href="">지도 </a> |
+            </span>
+            <span>
+                <a href="mypage/mypage">마이페이지 </a>
+            </span>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="carrot.app.mapper.CommentMapper">
+	<select id="commentList" parameterType="int" resultType="carrot.app.dto.CommentDTO">
+	<![CDATA[
+	select c.cnum
+	     , c.ctext
+	     , date_format(c.cdatetime, '%Y-%m-%d')                            as cdatetime
+	     , a.unick
+	     , case when minute(timediff(now(), c.cdatetime)) < 1
+	            then concat(second(timediff(now(), c.cdatetime)), '초 전')
+	            when hour(timediff(now(), c.cdatetime)) < 1
+	            then concat(minute(timediff(now(), c.cdatetime)), '분 전')
+	            when hour(timediff(now(), c.cdatetime)) < 24
+	            then concat(hour(timediff(now(), c.cdatetime)), '시간 전')
+	            else concat(datediff(now(), c.cdatetime), '일 전')
+		   end                                                             as commentdesc
+	     , c.user_num
+	  from comment c
+	     , account a
+	 where c.user_num = a.unum
+	   and c.post_num = #{post_num}
+	order by cnum asc
+	]]>
+	</select>
+
+	<insert id="addComment" parameterType="carrot.app.dto.CommentDTO">
+	insert into comment (ctext, cdatetime, post_num, user_num)
+	values(#{ctext}, now(), #{post_num}, #{user_num})
+	</insert>
+	
+	<delete id="deleteComment" parameterType="carrot.app.dto.CommentDTO">
+	delete from comment
+	 where cnum = #{cnum}
+	   and post_num = #{post_num}
+	   and user_num = #{user_num}
+	</delete>
+	
+	<select id="commentProfile" resultType="carrot.app.dto.CommentDTO">
+	select c.cnum
+	     , m.profile
+	  from comment c
+	     , myPage m
+	 where c.user_num = m.user_num
+	   and c.cnum = #{cnum}
+	</select>
+	
+	<select id="selectComment" parameterType="carrot.app.dto.CommentDTO" resultType="string">
+	select ctext
+	  from comment
+	 where cnum     = #{cnum}
+	   and post_num = #{post_num}
+	   and user_num = #{user_num}
+	</select>
+	
+	<update id="updateComment" parameterType="carrot.app.dto.CommentDTO">
+	update comment
+	   set ctext    = #{ctext}
+	 where cnum     = #{cnum}
+	   and post_num = #{post_num}
+	   and user_num = #{user_num}
+	</update>
+
+</mapper>

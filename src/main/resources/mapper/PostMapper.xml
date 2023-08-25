@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="carrot.app.mapper.PostMapper">
+	<select id="postList" parameterType="hashmap" resultType="carrot.app.dto.PostDTO">
+	select p.pnum
+	     , p.ptext
+	     , DATE_FORMAT(p.pdatetime, '%Y-%m-%d %H:%m') AS PDATETIME
+	     , p.user_num
+	     , length(p.pphoto)                           AS FILESIZE
+	     , a.unick                                    AS user_nick
+	     , (select count(*)
+	          from comment
+	         where post_num = p.pnum)                 AS COMMENTCNT 
+	     , (select count(*)
+	          from likes
+	         where post_pnum = p.pnum)                AS LIKECNT
+	     , p.user_num
+	  from post p
+	     , account a
+	 where 1 = 1
+	   and p.user_num = a.unum
+	order by pnum desc
+	</select>
+
+	<insert id="addPost" parameterType="carrot.app.dto.PostDTO">
+		insert into post (ptext, pdatetime, pphoto, user_num, pdatetime_modified)
+		values(#{ptext}, now(), #{fileContent}, #{user_num}, now())
+	</insert>
+	
+	<select id="selectpost" parameterType="carrot.app.dto.PostDTO" resultType="carrot.app.dto.PostDTO">
+	select p.pnum
+	     , p.ptext
+	     , DATE_FORMAT(p.pdatetime, '%Y-%m-%d %H:%m') AS PDATETIME
+	     , p.pphoto                                   AS FILECONTENT
+	     , (select profile
+	          from myPage
+	         where user_num = p.user_num)             AS PROFILECONTENT
+	     , p.user_num
+	     , a.unick                                    AS user_nick
+	     , p.pdatetime_modified
+	     , (select count(*)
+	          from comment
+	         where post_num = p.pnum)                 AS COMMENTCNT 
+	     , (select count(*)
+	          from likes
+	         where post_pnum = p.pnum)                AS LIKECNT
+	     , length(p.pphoto)                           AS FILESIZE 
+	  from post p
+	     , account a
+	 where p.user_num = a.unum
+	   and p.pnum = #{pnum}
+	</select>
+	
+	<select id="selectlikes" parameterType="carrot.app.dto.PostDTO" resultType="int">
+	select count(*)
+	  from likes
+	 where post_pnum = #{pnum}
+	   and user_id = #{user_num}
+	</select>
+	
+	<select id="countlikes" parameterType="carrot.app.dto.PostDTO" resultType="int">
+	select count(*)
+	  from likes
+	 where post_pnum = #{pnum}
+	</select>
+	
+	<insert id="addlikes" parameterType="carrot.app.dto.PostDTO">
+	insert into likes(user_id, post_pnum)
+	values (#{user_num}, #{pnum})
+	</insert>
+	
+	<select id="ismypost" parameterType="carrot.app.dto.PostDTO" resultType="int">
+	select count(*)
+	  from post
+	 where pnum = #{pnum}
+	   and user_num = #{user_num}
+	</select>
+	
+	<update id="updatepost" parameterType="carrot.app.dto.PostDTO">
+	update post
+	   set ptext = #{ptext}
+	     , pdatetime_modified = now()
+	<if test="filesize > 0">
+	     , pphoto = #{fileContent}
+	</if>
+	 where pnum = #{pnum}
+	   and user_num = #{user_num}
+	</update>
+
+	<delete id="deletepost" parameterType="carrot.app.dto.PostDTO">
+	delete from post
+	 where pnum = #{pnum}
+	   and user_num = #{user_num}
+	</delete>
+</mapper>

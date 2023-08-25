@@ -1,0 +1,137 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>모집글 글쓰기</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<style>
+		.image1 {
+			background-color: gray;
+			width: 100%;
+			height: 300px;}
+
+	</style>
+	<script>
+	let popup = true; // 주소 팝업이 여러개 뜨지 못하게 막을 변수
+
+	// 이미지 파일을 로드 했을 때의 이벤트
+	$(document).on("change", "#imageFile", function() {
+		// jQuery 객체를 일반 DOM 객체로 변환하기 위한 메소드 get(0)
+		let image = $(this).get(0);
+		// 파일의 내용이 있으면서, 배열의 0번째 index도 존재한다면
+		if (image.files && image.files[0]) {
+			// 일단 이미지 미리보기를 display:block 으로 만들고
+			$("#image-preview").show();
+
+			// FileReader 객체를 생성해서 이미지를 보여준다.
+			let reader = new FileReader();
+			reader.onload = function(e) {
+				$("#image-preview > img").attr("src", e.target.result);
+			};
+			reader.readAsDataURL(image.files[0]);
+		} else {
+			$("#image-preview").hide(); // 만약 파일을 선택하지 않았다면, 이미지 미리보기는 숨겨준다.
+		}
+	});
+
+	$(document).on("click", "#radr_search", function() {
+		if (popup) { // 만약 popup이 true면 아직 주소 팝업이 뜨기 전
+			popup = false; // 일단 if문 안에 들어오면 무조건 팝업이 뜨기 때문에 여기서 false로 변경하여 더 이상 팝업이 뜨지 못하도록 방지
+			new daum.Postcode({
+				oncomplete: function(data) {
+					console.log(data);
+					$("#rloc").val(data.address + " " + data.buildingName);
+					$("#sigungu").val(data.sigungu);
+					popup = true; // 팝업이 완료되면 닫히므로 다시 팝업을 띄어주기 위해 true로 변경
+				}
+			}).open();
+		}
+		return false;
+	});
+
+	function fn_validate() {
+		if (!$.trim($("#rtitle").val())) {
+			alert("모임 이름을 입력해주세요");
+			$("#rtitle").focus();
+			return false;
+		} else if (!$.trim($("#rtext").val())) {
+			alert("모임의 내용을 작성해주세요");
+			$("#rtext").focus();
+			return false;
+		} else if (!$.trim($("#rdate").val())) {
+			alert("모임의 날짜를 선택해주세요");
+			$("#rdate").focus();
+			return false;
+		} else if (!$.trim($("#rtime").val())) {
+			alert("모임의 시간을 선택해주세요");
+			$("#rtime").focus();
+			return false;
+		} else if (!$("#rloc").val()) {
+			alert("주소를 검색해주세요");
+			return false;
+		} else  if(!$.trim($("#etc").val())) {
+			alert("세부 사항을 입력해주세요");
+			return false;
+		}
+
+		$("#imageData").val($("#image-preview > img").attr("src"));
+
+		return true; 
+	}
+	</script>
+</head>
+<body>
+<div class="container">
+	<h2>게시판 글쓰기 [<th:block th:text="${username}" />]</h2>
+	<form action="/recruit/recruitwrite" method="post" enctype="multipart/form-data" onsubmit="return fn_validate();">
+		<div class="form-group">
+			<div class="image1">
+				<input type="file" id="imageFile" name="rphoto">
+				<input type="hidden" id="imageData" name="imageData" />
+				<div id="image-preview" class=" form-group">
+					<img src="" alt="이미지 미리보기" width="100%" height="290px" />
+				</div>
+			</div>
+			
+			<input type="text" class="form-control" id="rtitle" name="rtitle" placeholder="모임 이름 입력">
+
+			<textarea class="form-control" rows="5" id="rtext" name="rtext" placeholder="내용 작성"></textarea>
+
+			<hr/>
+			<h4>모임 정보</h4>
+
+			<div class="form-group">
+				<input type="date" id="rdate" name="rdate">
+			</div>
+
+			<div class="form-group">
+				<input type="time" id="rtime" name="rtime">
+			</div>
+
+			<div class="form-group">
+				<input type="number" id="rcount" name="rcount" min="3" max="120">
+			</div>
+
+			<div class="form-group">
+				<input type="text" class="form-control" id="rloc" name="rloc" style="width:70%; display:inline;" readonly />
+				<input type="hidden" id="sigungu" name="sigungu" />
+				<button id="radr_search" style="display:inline;">주소검색</button>
+			</div>
+
+			<div class="form-group">
+				<input type="text" class="form-control" id="etc" name="etc" placeholder="세부 사항">
+			</div>
+			<div class="form-group">
+				<label for="content">오픈 채팅주소 입력</label>
+				<input type="text" class="form-control" id="radrs" name="radrs">
+			</div>
+		</div>
+		<button type="submit" class="btn btn-default">등록</button>
+	</form>
+</div>
+</body>
+</html>
