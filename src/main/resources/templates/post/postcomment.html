@@ -1,0 +1,395 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>게시판</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+		<style>
+		.profile-group {
+			position:relative;
+		}
+
+		.profile-user-img{
+			position:relative;
+			float:left;
+			width: 50px;
+			height: 50px;
+			border-radius: 70px;
+			overflow: hidden;
+		}
+
+		.profile-user-img-img{
+		 width: 100%;
+		 height: 100%;
+		 object-fit: cover;}
+
+		.time{
+			float: right;
+			margin: 0 50px 50px 0;
+		}
+
+		.profile-desc {
+			position:relative;
+			float:left;
+			margin-left:10px;
+		}
+
+		.profile-desc h5 {
+			margin-bottom:5px;
+		}
+
+		.cl {
+			clear:both;
+		}
+		
+		.modal {
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			display: none;
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal.show {
+			display: block;
+		}
+
+		.modal_body {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 200px;
+			height: 200px;
+			padding: 40px;
+			text-align: center;
+			background-color: rgb(255, 255, 255);
+			border-radius: 10px;
+			box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+			transform: translateX(-50%) translateY(-50%);
+		}
+
+		.btn-open-popup{
+			width: 20px;
+			height: 20px;
+			border-radius: 70px;
+			overflow: hidden;
+			float: right;
+			margin: 0 50px 50px 0;
+		}
+
+		.btn-open-popup-img{
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.text{
+			text-decoration: none;
+			cursor:pointer;
+		}
+		
+		.comment-modal {
+			display:none;
+		}
+
+		.modal-group {
+			border-bottom:1px solid #e3e3e3;
+		}
+		
+		/* 코멘트 관련 */
+		.comment-modal {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			display: none;
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.comment-modal.show {
+			display: block;
+		}
+
+		.comment_modal_body {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 500px;
+			height: 150px;
+			padding: 20px;
+			text-align: center;
+			background-color: rgb(255, 255, 255);
+			border-radius: 10px;
+			box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+			transform: translateX(-50%) translateY(-50%);
+		}
+		
+		.comment_modal_body #comment {
+			height:80px;
+			margin-bottom:5px;
+		}
+	</style>
+	<script th:inline="javascript">
+		let unum = /*[[${userVo.unum}]]*/'';
+		$(document).on("click", "#add", function() {
+			console.log("등록")
+			if ($("#ctext").val().trim()) {
+				$.ajax({
+					async:false,
+					url:"/comment/addComment",
+					data:{
+						"post_num":$("#pnum").val(),
+						"ctext":$("#ctext").val()
+					},
+					type:"post",
+					dataType:"json",
+					success:function(data) {
+						if (Number(data.result) != 1) {
+							alert("코멘트 등록에 실패했습니다.");
+						}
+						refreshComment();
+					},
+					error:function(xhr, status, res) {
+						console.log(xhr.responseText, status, res);
+					}
+				})
+			}
+		});
+
+		$(document).on("click", "a.modal-btn", function() {
+			console.log("모달 클릭");
+			let cnum = $(this).closest(".btn-open-popup").find(":hidden[name=cnum]").val();
+			let user_num = $(this).closest(".btn-open-popup").find(":hidden[name=user_num]").val();
+			console.log("cnum :", cnum, ", user_num :", user_num);
+			$("#cnum").val(cnum);
+			$("#user_num").val(user_num);
+			$("#modal").addClass("show");
+			$("body").css("overflow", "hidden");
+			return false;
+		});
+
+		$(document).on("click", "#delete", function() {
+			let cnum = $("#cnum").val();
+			let pnum = $("#pnum").val();
+			let user_num = $("#user_num").val();
+			if (unum == user_num) {
+				$.ajax({
+					async:false,
+					url:"/comment/deleteComment",
+					type:"post",
+					data:{"post_num":pnum, "cnum":cnum},
+					dataType:"json",
+					success:function(data) {
+						$("#modal").removeClass("show");
+						$("body").css("overflow", "auto");
+						refreshComment();
+					},
+					error:function(xhr, status, res) {
+						$("#modal").removeClass("show");
+						$("body").css("overflow", "auto");
+						console.log("오류발생\n", xhr.responseText, status, res);
+					}
+				});
+			} else {
+				alert("본인이 작성한 글만 삭제 가능합니다.");
+			}
+
+			return false;
+		});
+
+		$(document).on("click", "#modify", function() {
+			let cnum = $("#cnum").val();
+			let pnum = $("#pnum").val();
+			let user_num = $("#user_num").val();
+			if (unum == user_num) {
+				$.ajax({
+					async:false,
+					url:"/comment/selectComment",
+					type:"post",
+					data:{"post_num":pnum, "cnum":cnum},
+					dataType:"json",
+					success:function(data) {
+						$("#modal").removeClass("show");
+						$("#comment-modal").addClass("show");
+						$("#comment").val(data.ctext);
+						console.log(data);
+					},
+					error:function(xhr, status, res) {
+						$("#comment-modal").removeClass("show");
+						$("body").css("overflow", "auto");
+						console.log("오류발생\n", xhr.responseText, status, res);
+					}
+				});
+			} else {
+				alert("본인이 작성한 글만 삭제 가능합니다.");
+			}
+
+			return false;
+		});
+
+		$(document).on("click" , "#comment-submit", function() {
+			let cnum = $("#cnum").val();
+			let pnum = $("#pnum").val();
+			let ctext= $("#comment").val();
+			$.ajax({
+				async:false,
+				url:"/comment/updateComment",
+				type:"post",
+				data:{"post_num":pnum, "cnum":cnum, "ctext":ctext},
+				dataType:"json",
+				success:function(data) {
+					$("#comment-modal").removeClass("show");
+					$("body").css("overflow", "auto");
+					refreshComment();
+				},
+				error:function(xhr, status, res) {
+					$("#comment-modal").removeClass("show");
+					$("body").css("overflow", "auto");
+					console.log("오류발생\n", xhr.responseText, status, res);
+				}
+			});
+
+			return false;
+		});
+
+		$(document).on("click" , "#comment-cancel", function() {
+			$("#comment-modal").removeClass("show");
+			$("body").css("overflow", "auto");
+		});
+
+		$(document).on("click", "#cancel", function() {
+			console.log("취소");
+			$("#modal").removeClass("show");
+			$("body").css("overflow", "auto");
+			return false;
+		});
+	
+
+		function refreshComment() {
+			$.ajax({
+				url:"/comment/commentList",
+				data:{"post_num":$("#pnum").val()},
+				type:"post",
+				dataType:"json",
+				success:function(data) {
+					if (data) {
+						$("#commentArea").children().remove();
+						$(data).each(function(i, elem) {
+							console.log(elem);
+							$("#commentArea").append(
+								$("<div>").addClass("form-group modal-group")
+									.append(
+										$("<div>").addClass("form-group")
+											.append($("<div>").addClass("btn-open-popup")
+												.append($("<input>", {type:"hidden", name:"cnum", value:elem.cnum}))
+												.append($("<input>", {type:"hidden", name:"user_num", value:elem.user_num}))
+												.append($("<a>").addClass("modal-btn").append($("<img>", {src:"/images/three_dot.png"}).addClass("btn-open-popup-img")))
+											)
+											.append($("<div>").addClass("profile-user-img")
+												.append($("<img>", {alt:"profile"}).attr("src", "/post/commentProfile/" + elem.cnum)))
+											.append($("<p>").addClass("time").text(elem.commentdesc))
+											.append($("<h5>")
+												.append($("<b>").text(elem.unick)))
+											.append($("<h5>").text(elem.ctext))
+											.append($("<hr />"))
+									)
+							);
+						});
+					}
+					console.log(data);
+				},
+				error:function(xhr, status, res) {
+					console.log(xhr.responseText, status, res);
+				}
+			});
+		}
+	</script>
+</head>
+<body>
+<div class="container">
+	<input type="hidden" id="cnum" />
+	<input type="hidden" id="user_num" />
+	<div id="comment-modal" class="comment-modal">
+		<div class="comment_modal_body">
+			<div class="form-group">
+				<textarea class="form-control" placeholder="수정될 댓글내용" id="comment"></textarea>
+				<button id="comment-submit" class="btn btn-default">확인</button>
+				<button id="comment-cancel" class="btn btn-default">취소</button>
+			</div>
+		</div>
+	</div>
+	<div id="modal" class="modal">
+		<div class="modal_body">
+			<a id="delete" class="text">삭제</a><br/><hr/>
+			<a id="modify" class="text">수정</a><br/><hr/>
+			<a id="cancel" class="text">취소</a>
+		</div>
+	</div>
+	<h2>댓글 달기</h2>
+	<form action="/post/addcomment" method="post">
+		<input type="hidden" id="pnum" th:value="${post.pnum}" />
+		<div class="form-group">
+			<div class="profile-group">
+				<div class="profile-user-img">
+					
+					<img th:src="@{/post/profileImage/{pnum}(pnum=${post.pnum})}" />
+				</div>
+				<div class="profile-desc">
+					<h5>
+						<b th:text="${post.user_nick}"></b>
+					</h5>
+					<p th:text="${post.pdatetime}"></p>
+				</div>
+			</div>
+			<div class="cl"></div>
+			<h5 th:text="${post.ptext}"></h5>
+			<th:block th:if="${post.filesize > 0}">
+				<img th:src="@{/post/viewImage/{pnum}(pnum=${post.pnum})}" style="width:300px; height:250px;" />
+			</th:block>
+			<br/><br/>
+			<div class="like-comment">
+				<a href="" class="like-btn">🌳</a>
+				<span class="like-count" th:text="${post.likecnt}"></span>
+				<a href="" class="comment-btn">✏️</a>
+				<span class="comment-count" th:text="${post.commentcnt}"></span>
+			</div>
+		</div>
+		<hr/>
+		<div id="commentArea">
+			<th:block th:each="comment : ${commentList}">
+			<div class="form-group modal-group">
+				<div class="form-group">
+					<div class="btn-open-popup">
+						<input type="hidden" name="cnum" th:value="${comment.cnum}" />
+						<input type="hidden" name="user_num" th:value="${comment.user_num}" />
+						<a href="#" class="modal-btn">
+							<img src="/images/three_dot.png" alt="profile" class="btn-open-popup-img">
+						</a>
+					</div>
+				</div>
+				<div class="profile-user-img">
+					<img th:src="@{/post/commentProfile/{cnum}(cnum=${comment.cnum})}" alt="profile" class="profile-user-img-img">
+				</div>
+				<p class="time" th:text="${comment.commentdesc}"></p>
+				<h5>
+					<b th:text="${comment.unick}"></b>
+				</h5>
+				<h5 th:text="${comment.ctext}"></h5>
+				<div class="cl"></div>
+			</div>
+		</th:block>
+		</div>
+		<div class="form-group">
+			<input type="text" id="ctext" class="form-control" placeholder="댓글을 입력하세요" name="comment">
+			<button type="button" id="add" class="btn btn-default">등록</button>
+		</div>
+		<h5><a href="/post/postlist"> < 뒤로 가기 </a> </h5>
+	</form>
+</div>
+</body>
+</html>

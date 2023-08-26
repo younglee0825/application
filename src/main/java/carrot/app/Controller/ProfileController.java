@@ -4,8 +4,12 @@ import carrot.app.Profile.ProfileService;
 import carrot.app.Profile.ProfileVo;
 import carrot.app.User.UserService;
 import carrot.app.User.UserVo;
+import carrot.app.dto.PostDTO;
+import carrot.app.dto.RecruitDTO;
 import carrot.app.mapper.MapMapper;
 import carrot.app.mapper.UserMapper;
+import carrot.app.service.PostService;
+import carrot.app.service.RecruitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,15 +21,26 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class ProfileController {
 
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private RecruitService recruitService;
+    @Autowired
+    private PostService postService;
+    @Autowired
     private UserService userService;
+
+    @Autowired
     private final UserMapper userMapper;
+    @Autowired
     private MapMapper mapMapper;
+
 
 
     @GetMapping("/mypage")
@@ -97,6 +112,63 @@ public class ProfileController {
         return "redirect:/mypage";
         // UserVo 객체를 JSON 형태로 반환하지 않음
     }
+    /**
+     *
+     * 사용자가 작성한 게시물
+     *
+     * */
+    @GetMapping("/mypage/content")
+    public String postListAuthentication (Model model, Authentication authentication) {
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
+        UserVo userVo = (UserVo) authentication.getPrincipal();
+        model.addAttribute("userVo", userVo);
+
+        List<PostDTO> postListAuthentication = postService.getPostListAuthentication(0, 4, userVo.getUnum());
+        model.addAttribute("postList", postListAuthentication);
+        model.addAttribute("accountNumber",userVo.getUnum());
+
+        return "post/postlist";
+    }
+    /**
+     * 내가 작성한 모집글
+     * */
+    @GetMapping("/mypage/recruit")
+    public String recruitListAuthentication (Model model, Authentication authentication) {
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
+        UserVo userVo = (UserVo) authentication.getPrincipal();
+        model.addAttribute("userVo", userVo);
+
+        List<RecruitDTO> recruitList = recruitService.getRecruitAuthentication(0, 4, userVo.getUnum());
+        model.addAttribute("recruitList", recruitList);
+        model.addAttribute("accountNumber",userVo.getUnum());
+
+
+        return "recruit/recruitlist";
+    }
+
+    @GetMapping("/mypage/part")
+    public String recruitpart (Model model, Authentication authentication){
+        if (authentication == null){
+            return "redirect:/login";
+        }
+
+        UserVo userVo = (UserVo) authentication.getPrincipal();
+        model.addAttribute("userVo", userVo);
+
+        List<RecruitDTO> recruitListForUser = recruitService.getRecruitListForUser(userVo.getUnum());
+        model.addAttribute("recruitList", recruitListForUser);
+        model.addAttribute("accountNumber", userVo.getUnum());
+
+        return "recruit/recruitlist";
+    }
+
+
 }
 
 

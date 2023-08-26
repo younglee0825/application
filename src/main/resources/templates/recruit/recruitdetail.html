@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>모집글 디테일</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<style>
+	.profile-user-img{
+		width: 50px;
+		height: 50px;
+		border-radius: 70px;
+		overflow: hidden;
+	}
+
+	.profile-user-img-img{
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.modal {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: none;
+		background-color: rgba(0, 0, 0, 0.4);
+	}
+
+	.modal.show {
+		display: block;
+	}
+
+	.modal_body {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 200px;
+		height: 200px;
+		padding: 40px;
+		text-align: center;
+		background-color: rgb(255, 255, 255);
+		border-radius: 10px;
+		box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+		transform: translateX(-50%) translateY(-50%);
+	}
+
+	p.box {
+		background-color: silver;
+		width: 100%;
+		height: 50px;
+	}
+
+	.btn-open-popup{
+		width: 20px;
+		height: 20px;
+		border-radius: 70px;
+		overflow: hidden;
+		float: right;
+		margin: 0 50px 50px 0;
+	}
+
+	.btn-open-popup-img{
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.text{
+		text-decoration: none;
+		cursor:pointer;
+	}
+
+	.form-group2{
+		position: relative;
+		height:70px;
+	}
+
+	p.image2 {
+		position:relative;
+		float:left;
+		background-color: lime;
+		width: 120px;
+		height: 40px;
+		border-radius: 70px;
+		overflow: hidden;
+		padding-left: 40px;
+		padding-top: 11px;
+		position: absolute;
+		top: 10px;
+	}
+
+	p.image3 {
+		position:relative;
+		float:right;
+		width: 50px;
+		height: 50px;
+		border-radius: 70px;
+		overflow: hidden;
+		padding-left: 23px;
+		padding-top: 15px;
+	}
+
+	.cl {
+		clear:both;
+	}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+<body>
+<div class="container">
+	<form id="joinform" action="/recruit/recruitjoin" method="post">
+		<input type="hidden" name="rnum" th:value="${recruit.rnum}" />
+		<div class="form-group">
+			<h5><a href="javascript:history.back();"> < 뒤로 가기 </a> </h5>
+			<div class="btn-open-popup">
+				<a href="#" class="modal-popup">
+					<img src="/images/three_dot.png" alt="profile" class="btn-open-popup-img">
+				</a>
+			</div>
+			<div class="modal">
+				<div class="modal_body">
+					<a href="#" id="delete" class="text">삭제</a><br/><hr/>
+					<a href="#" id="modify" class="text">수정</a><br/><hr/>
+					<a href="#" id="cancel" class="text">취소</a>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<!--<img th:src="${recruit.imageData}" width="100%" height="300px;">-->
+			<img th:src="${recruit.imageData}" style="width:100%; height:300px;" />
+			<div class="form-group2">
+				<p class="image2"><b th:text="${recruit.status}"></b></p>
+				<p class="image3">
+					<b id="joinCount" class="cl" th:text="${recruit.joinCount}"></b>
+				</p>
+			</div>
+			<div class="form-group">
+				<h1><b th:text="${recruit.rtitle}"></b></h1>
+			</div>
+			<div class="profile-user-img">
+				<img th:src="@{/recruit/profileImage/{rnum}(rnum=${recruit.rnum})}" />
+			</div>
+			<h5><b th:text="${recruit.userNick}"></b></h5>
+			<h4><b>모임 정보</b></h4>
+			<h4 th:text="|${recruit.rdate} ${recruit.week} ${recruit.rtime}|"></h4>
+			<h4 th:text="${recruit.rloc}"></h4>
+			<h4 th:text="|${recruit.etc}(세부 사항)|"></h4>
+			<h4 th:text="|${recruit.rcount}명|"></h4>
+			<hr />
+			<h4 th:text="${recruit.rtext}"</h4>
+			<hr />
+			<h4 th:text="${recruit.radrs}"></h4>
+		</div>
+		<button id="join" class="btn btn-primary">참여하기</button>
+	</form>
+</div>
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	let userNum = /*[[${userVo.unum}]]*/'';
+	let recruitUserNum = /*[[${recruit.userNum}]]*/'';
+	$(document).on("click", "#join", function() {
+		let rnum = $(":hidden[name=rnum]").val();
+		$.ajax({
+			async:false,
+			url:"/recruit/recruitjoin",
+			type:"post",
+			data:{"rnum":rnum},
+			dataType:"json",
+			success:function(data) {
+				let result = Number(data.result);
+				if (result == 1) {
+					alert("참여하기가 완료되었습니다.");
+				} else if (result == -1) {
+					alert("이미 참여한 게시글입니다.");
+				}
+				$("#joinCount").text(data.count);
+			},
+			error:function(xhr, status, response) {
+				console.log("오류 발생", xhr.repsonseText, status, response);
+			}
+		});
+
+		return false;
+	});
+
+	$(document).on("click", "a.modal-popup", function() {
+		$(".modal").addClass("show");
+		$("body").css("overflow", "hidden");
+
+		return false;
+	});
+
+	// 수정폼 이동
+	$(document).on("click", "#modify", function() {
+		if (userNum == recruitUserNum) {
+			$("#joinform").attr("action", "/recruit/recruitmodify").submit();
+		} else {
+			alert("본인이 작성한 글만 수정 가능합니다.");
+		}
+		return false;
+	});
+
+	// 삭제
+	$(document).on("click", "#delete", function() {
+		if (userNum == recruitUserNum) {
+			$("#joinform").attr("action", "/recruit/recruitdelete").submit();
+		} else {
+			alert("본인이 작성한 글만 삭제 가능합니다.");
+		}
+		return false;
+	});
+
+	$(document).on("click", "#cancel", function() {
+		$(".modal").removeClass("show");
+		$("body").css("overflow", "auto");
+
+		return false;
+	});
+	/*]]>*/
+</script>
+</body>
+</html>

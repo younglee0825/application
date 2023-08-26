@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>모집글 리스트</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        .profile-user-img{
+         width: 50px;
+         height: 50px;
+         border-radius: 70px;
+         overflow: hidden;}
+
+        .profile-user-img-img{
+         width: 100%;
+         height: 100%;
+         object-fit: cover;}
+
+
+
+       body{
+  display: flex;
+}
+
+.menu {
+
+  height:34px;
+  position: relative;
+  left: 100px;
+
+}
+
+.menu .search input {
+  width:36px;
+  height:34px;
+  padding: 4px 10px;
+  border:1px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 5px;
+  outline: none;
+  background-color: #fff;
+  color:#777;
+  font-size: 12px;
+  transition: width .4s;
+}
+
+.menu .search input:focus{
+  width:190px;
+  border-color:#616952;
+}
+
+.menu .search .material-icons{
+  height:24px;
+  position:absolute;
+  top:0;
+  bottom:0;
+  right:5px;
+  margin:auto;
+}
+
+
+
+nav{
+float: left;
+width: 45%;
+border: none;
+overflow: auto;}
+
+aside{
+float: right;
+width: 45%;
+border: none;
+overflow: auto;}
+
+img{
+border-radius: 10px;}
+
+
+
+        .btn-open-popup-img{
+         width: 25px;
+         height: 25px;
+         overflow: hidden;
+         float: right;
+         margin: 20px 50px 0 0;
+         object-fit: cover;}
+
+
+
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+<body>
+<div class="container">
+    <h2>모집글</h2>
+    <form action="write.jsp" method="post">
+        <div class="form-group">
+            <span>
+                <button type="button" class="btn btn-default" onclick="location.href='recruitform.html'">글쓰기</button>
+            </span>
+
+            <span class="menu">
+                <span class="search">
+                    <input type="text" />
+                    <span class="material-icons">검색</span>
+                </span>
+            </span>
+        </div>
+        <div class="form-group">
+            <span>
+                <a href="recruitlist.html">전체 </a> |
+            </span>
+            <span>
+                <a href="">모집중 </a> |
+            </span>
+            <span>
+                <a href="recruitlistscrap.html">스크랩 </a>
+            </span>
+        </div>
+
+        <div class="q">
+            <nav>
+                <a href="recruitdetail.html">
+                    <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA1MjNfMjcy%2FMDAxNjg0ODQ3MDY2NTAy.7qMkk85TTbT8VYTvMoh72N9VnmNpQxKWWw5-kMKtQTog.CkmNN0zkRoU98GA4LaoISnmMCOAyfWP0LGDbY2BRnD4g.JPEG.qortjf1420%2F2023-05-15-12-18-15-426.jpg&type=sc960_832" width="100%" height="200px;">
+                    <img src="빈하트.png" alt="profile" class="btn-open-popup-img">
+                    <div class="profile-user-img">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2Fdata11%2F2005%2F8%2F1%2F191%2F2005072802363942-vaoro819.jpg&type=sc960_832" alt="profile" class="profile-user-img-img">
+                    </div>
+                    <h5><b>닉네임</b></h5>
+                    <h3>서울숲에서 플로깅할 사람 모집합니다.</h3>
+                    <span>성동구</span>
+                    <span>8월 18일</span>
+                    <div>모집 중</div>
+                </a>
+
+            </nav>
+            <aside>
+                <a href="recruitdetail.html">
+                    <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA1MjNfMjcy%2FMDAxNjg0ODQ3MDY2NTAy.7qMkk85TTbT8VYTvMoh72N9VnmNpQxKWWw5-kMKtQTog.CkmNN0zkRoU98GA4LaoISnmMCOAyfWP0LGDbY2BRnD4g.JPEG.qortjf1420%2F2023-05-15-12-18-15-426.jpg&type=sc960_832" width="100%" height="200px;">
+                    <img src="빈하트.png" alt="profile" class="btn-open-popup-img">
+                    <div class="profile-user-img">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2Fdata11%2F2005%2F8%2F1%2F191%2F2005072802363942-vaoro819.jpg&type=sc960_832" alt="profile" class="profile-user-img-img">
+                    </div>
+                    <h5><b>닉네임</b></h5>
+                    <h3>서울숲에서 플로깅할 사람 모집합니다.</h3>
+                    <span>성동구</span>
+                    <span>8월 18일</span>
+                    <div>모집 중</div>
+                </a>
+            </aside>
+        </div>
+        <div class="q">
+            <nav>
+                <a href="recruitdetail.html">
+                    <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA1MjNfMjcy%2FMDAxNjg0ODQ3MDY2NTAy.7qMkk85TTbT8VYTvMoh72N9VnmNpQxKWWw5-kMKtQTog.CkmNN0zkRoU98GA4LaoISnmMCOAyfWP0LGDbY2BRnD4g.JPEG.qortjf1420%2F2023-05-15-12-18-15-426.jpg&type=sc960_832" width="100%" height="200px;">
+                    <img src="빈하트.png" alt="profile" class="btn-open-popup-img">
+                    <div class="profile-user-img">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2Fdata11%2F2005%2F8%2F1%2F191%2F2005072802363942-vaoro819.jpg&type=sc960_832" alt="profile" class="profile-user-img-img">
+                    </div>
+                    <h5><b>닉네임</b></h5>
+                    <h3>서울숲에서 플로깅할 사람 모집합니다.</h3>
+                    <span>성동구</span>
+                    <span>8월 18일</span>
+                    <div>모집 중</div>
+                </a>
+
+            </nav>
+            <aside>
+                <a href="recruitdetail.html">
+                    <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA1MjNfMjcy%2FMDAxNjg0ODQ3MDY2NTAy.7qMkk85TTbT8VYTvMoh72N9VnmNpQxKWWw5-kMKtQTog.CkmNN0zkRoU98GA4LaoISnmMCOAyfWP0LGDbY2BRnD4g.JPEG.qortjf1420%2F2023-05-15-12-18-15-426.jpg&type=sc960_832" width="100%" height="200px;">
+                    <img src="빈하트.png" alt="profile" class="btn-open-popup-img">
+                    <div class="profile-user-img">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2Fdata11%2F2005%2F8%2F1%2F191%2F2005072802363942-vaoro819.jpg&type=sc960_832" alt="profile" class="profile-user-img-img">
+                    </div>
+                    <h5><b>닉네임</b></h5>
+                    <h3>서울숲에서 플로깅할 사람 모집합니다.</h3>
+                    <span>성동구</span>
+                    <span>8월 18일</span>
+                    <div>모집 중</div>
+                </a>
+            </aside>
+        </div>
+
+
+
+
+
+    </form>
+</div>
+<script>
+
+
+      const searchEl = document.querySelector('.search');
+      const searchInputEl = searchEl.querySelector('input');
+
+searchEl.addEventListener('click', function(){
+    searchInputEl.focus();
+});
+
+searchInputEl.addEventListener('focus', function(){
+    searchInputEl.classList.add('focused');
+    searchInputEl.setAttribute('placeholder','통합검색');
+});
+
+searchInputEl.addEventListener('blur', function(){
+    searchInputEl.classList.remove('focused');
+    searchInputEl.removeAttribute('placeholder', '');
+});
+
+    </script>
+</body>
+</html>

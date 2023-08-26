@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>모집글 리스트</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<style>
+		.profile-user-img{
+			width: 50px;
+			height: 50px;
+			border-radius: 70px;
+			overflow: hidden;
+		}
+		
+		.profile-user-img-img{
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+		
+		body{
+			display: flex;
+			height: 100%;
+		}
+	
+		.menu {
+			height:34px;
+			position: relative;
+			left: 100px;
+		}
+	
+		.menu .search input {
+			width:36px;
+			height:34px;
+			padding: 4px 10px;
+			border:1px solid #ccc;
+			box-sizing: border-box;
+			border-radius: 5px;
+			outline: none;
+			background-color: #fff;
+			color:#777;
+			font-size: 12px;
+			transition: width .4s;
+		}
+	
+		.menu .search input:focus{
+			width:190px;
+			border-color:#616952;
+		}
+	
+		.menu .search .material-icons{
+			height:24px;
+			position:absolute;
+			top:0;
+			bottom:0;
+			right:5px;
+			margin:auto;
+		}
+	
+		div.nav {
+			float: left;
+			width: 45%;
+			border: none;
+			overflow: auto;
+			
+		}
+
+		div.nav:nth-child(even) {
+			margin-left:40px;
+		}
+	
+		img {
+			border-radius: 10px;
+		}
+
+		.btn-open-popup-img{
+			width: 25px;
+			height: 25px;
+			overflow: hidden;
+			float: right;
+			margin: 20px 50px 0 0;
+			object-fit: cover;
+		}
+		
+		.profile-group {
+			position:relative;
+		}
+		
+		.profile-group > h5 {
+			position:absolute;
+			top:10px;
+			left:60px;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+<body>
+<div class="container">
+	<h2>모집글</h2>
+	<form id="searchform" action="/recruit/recruitlist" method="post">
+		<input type="hidden" id="category" name="category" value="all" />
+		<div class="form-group">
+			<span>
+				<button type="button" class="btn btn-default" onclick="location.href='/recruit/recruitform'">글쓰기</button>
+			</span>
+			<span class="menu">
+				<span class="search">
+					<input type="text" name="searchword" th:value="${searchword}" />
+					<span class="material-icons">검색</span>
+				</span>
+			</span>
+		</div>
+		<div class="form-group">
+			<span>
+				<a href="#" class="searchCate" data-category="all">전체 </a> |
+			</span>
+			<span>
+				<a href="#" class="searchCate" data-category="recruit">모집중 </a> |
+			</span>
+			<span>
+				<a href="#" class="searchCate" data-category="scrap">스크랩 </a>
+			</span>
+		</div>
+	</form>
+	<div class="q">
+		<th:block th:if="${recruitList != null}">
+			<th:block th:each="recruit : ${recruitList}">
+			<div class="nav">
+				<a th:href="@{/recruit/recruitdetail/{rnum}(rnum=${recruit.rnum})}">
+					<img th:src="${recruit.imageData}" width="100%" height="200px;">
+				</a>
+				
+				<div class="profile-group">
+						<a href="#" class="scrap">
+						<input type="hidden" name="rnum" th:value="${recruit.rnum}" />
+					<th:block th:if="${recruit.scrapCount == 0}">
+						<img src="/images/empty_heart.png" alt="profile" class="btn-open-popup-img" />
+					</th:block>
+					<th:block th:if="${recruit.scrapCount == 1}">
+						<img src="/images/filled_heart.png" alt="profile" class="btn-open-popup-img" />
+					</th:block>
+					</a>
+					<div class="profile-user-img">
+						<img th:src="@{/recruit/profileImage/{rnum}(rnum=${recruit.rnum})}" alt="profile" class="profile-user-img-img" />
+					</div>
+					<h5><b th:text="${recruit.userNick}"></b></h5>
+				</div>
+				<a th:href="@{/recruit/recruitdetail/{rnum}(rnum=${recruit.rnum})}">
+					<h3 th:text="${recruit.rtitle}"></h3>
+					<span th:text="${recruit.sigungu}"></span>
+					<span th:text="${recruit.rdatetime}"></span>
+					<div th:text="${recruit.status}"></div>
+				</a>
+			</div>
+			</th:block>
+		</th:block>
+	</div>
+</div>
+<script>
+	const searchEl = document.querySelector('.search');
+	const searchInputEl = searchEl.querySelector('input');
+
+	searchEl.addEventListener('click', function(){
+		searchInputEl.focus();
+	});
+
+	searchInputEl.addEventListener('focus', function(){
+		searchInputEl.classList.add('focused');
+		searchInputEl.setAttribute('placeholder','통합검색');
+	});
+
+	searchInputEl.addEventListener('blur', function(){
+		searchInputEl.classList.remove('focused');
+		searchInputEl.removeAttribute('placeholder', '');
+	});
+
+	$(document).on("click", ".scrap", function() {
+		let _this = $(this);
+		let rnum = $(this).find(":hidden[name=rnum]").val();
+		$.ajax({
+			async:false,
+			url:"/recruit/recruitscrap",
+			type:"post",
+			data:{"rnum":rnum},
+			dataType:"json",
+			success:function(data) {
+				if (Number(data.result) == 1) {
+					$(_this).find("img").attr("src", "/images/filled_heart.png");
+				}
+			},
+			error:function(xhr, status, response) {
+				console.log("오류 발생", xhr.repsonseText, status, response);
+			}
+		});
+	});
+	
+	$(document).on("click", ".searchCate", function() {
+		let category = $(this).data("category");
+		console.log("카테고리 :", category);
+		$("#category").val(category);
+		$("#searchform").submit();
+		return false;
+	});
+</script>
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	let msg = /*[[${msg}]]*/'';
+	if (msg) {
+		alert(msg);
+	}
+	/*]]>*/
+</script>
+</body>
+</html>
