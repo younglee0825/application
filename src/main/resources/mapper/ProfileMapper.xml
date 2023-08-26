@@ -5,14 +5,14 @@
 
     <insert id="saveProfile" parameterType="carrot.app.Profile.ProfileVo">
         INSERT into myPage
-        (user_nick, user_num, goal, profile, image)
-        VALUES (#{user_nick}, #{user_num}, #{goal}, #{profile}, #{image})
+        (user_nick, user_num, goal, image)
+        VALUES (#{user_nick}, #{user_num}, #{goal},  #{image})
     </insert>
     <!-- Save user's goal -->
     <insert id="saveUserGoal" parameterType="carrot.app.Profile.Profile">
         INSERT INTO myPage
-        (user_nick,user_num, goal, profile)
-        VALUES (#{user_nick},#{user_num},#{goal},#{profile})
+        (user_nick,user_num, goal)
+        VALUES (#{user_nick},#{user_num},#{goal})
     </insert>
     <select id="getProfileByUserNum" parameterType="java.lang.Integer" resultType="carrot.app.Profile.ProfileVo">
         SELECT * FROM myPage WHERE user_num = #{userNum}

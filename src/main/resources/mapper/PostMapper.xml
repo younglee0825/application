@@ -49,9 +49,9 @@
 	     , p.ptext
 	     , DATE_FORMAT(p.pdatetime, '%Y-%m-%d %H:%m') AS PDATETIME
 	     , p.pphoto                                   AS FILECONTENT
-	     , (select profile
+	     , (select image
 	          from myPage
-	         where user_num = p.user_num)             AS PROFILECONTENT
+	         where user_num = p.user_num)             AS IMAGECONTENT
 	     , p.user_num
 	     , a.unick                                    AS user_nick
 	     , p.pdatetime_modified
