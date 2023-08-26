@@ -103,9 +103,9 @@
 	            WHEN '6' THEN '금요일'
 	            WHEN '7' THEN '토요일'
 	       END                                  as week
-	     , (select profile
+	     , (select image
 	          from myPage
-	         where user_num = a.unum)           as profile
+	         where user_num = a.unum)           as image
 	     , case when now() < r.rdatetime
 	                 and r.rcount > (select count(*)
 	                                   from rjoin
