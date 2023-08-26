@@ -29,6 +29,13 @@ dependencies {
 	// JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	developmentOnly  'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// Add any other dependencies your project requires
+
+	// Google Maps API
+	implementation 'com.google.maps:google-maps-services:0.15.0'
 	//runtimeOnly 'com.mysql:mysql-connector-j'
 	//implementation 'org.springframework.boot:spring-boot-starter-actuator'
 

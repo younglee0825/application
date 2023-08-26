@@ -31,7 +31,6 @@ public class Profile implements Serializable {
     private String user_nick;
 
     @Column(name="myPage")
-    private Long profile;
     private String goal;
 
     @Lob

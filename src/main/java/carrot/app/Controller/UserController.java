@@ -69,7 +69,7 @@ public class UserController {
 //     * @return
 //     */
    @GetMapping("/user_access")
-//   @ResponseBody
+   @ResponseBody
    public UserVo userAccess(Model model, Authentication authentication) {
        //Authentication 객체를 통해 유저 정보를 가져올 수 있다.
        UserVo userVo = (UserVo) authentication.getPrincipal();  //userDetail 객체를 가져옴

@@ -19,7 +19,6 @@ public class ProfileVo {
 
 
     @Column(name = "myPage")
-    private Long profile;
     private String goal;
     private byte[] image;
 

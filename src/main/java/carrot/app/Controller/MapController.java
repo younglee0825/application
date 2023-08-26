@@ -53,27 +53,24 @@ public class MapController {
         try {
             JsonNode jsonNode = objectMapper.readTree(measurementData);
             int elapsedTimeInSeconds = jsonNode.get("mtime").asInt();
-            double distance = jsonNode.get("mdistance").asDouble();
             double calculatedCalories = jsonNode.get("mykcals").asDouble();
-            //LocalDateTime mdatetime = LocalDateTime.parse(jsonNode.get("mdatetime").asText(), DateTimeFormatter.ISO_DATE_TIME);
-            String dateTimeString = jsonNode.get("mdatetime").asText();
 
-            //dateTimeString = dateTimeString.replace("오후", "PM").replaceAll("오후|오전", "");
+            // 이제 실제 GPS 데이터를 사용하여 이동거리 계산
+            // 예시로 임의의 값을 사용하도록 하겠습니다.
+            double gpsDistance = 5.0; // 실제 GPS 데이터로 대체
 
+            // 이동거리를 기반으로 칼로리 계산
+            double gpsCalories = gpsDistance * 100; // 간단한 칼로리 계산식
+
+            // LocalDateTime을 포맷에 맞게 변환
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy. M. d. HH:mm");
-            LocalDateTime mdatetime = LocalDateTime.parse(dateTimeString, formatter);
-
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy. M. d.", Locale.US);
-            //LocalDate localDate = LocalDate.parse(jsonNode.get("mdatetime").asText(), formatter);
-            //LocalDateTime mdatetime = localDate.atStartOfDay();
-            // Convert elapsedTimeInSeconds to Time type
-            Time mtime = Time.valueOf(LocalTime.ofSecondOfDay(elapsedTimeInSeconds));
+            LocalDateTime mdatetime = LocalDateTime.parse(jsonNode.get("mdatetime").asText(), formatter);
 
             // Create a MapVo object to store data
             MapVo mapVo = new MapVo();
-            mapVo.setMtime(mtime);
-            mapVo.setMdistance(distance);
-            mapVo.setMykcals(calculatedCalories);
+            mapVo.setMtime(new Time(elapsedTimeInSeconds * 1000)); // 밀리초 단위로 변환
+            mapVo.setMdistance(gpsDistance);
+            mapVo.setMykcals(gpsCalories);
             mapVo.setMdatetime(mdatetime);
             mapVo.setUser_nick(userVo.getUnick());
             mapVo.setUser_num(userVo.getUnum());
@@ -88,6 +85,7 @@ public class MapController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to process measurement data");
         }
     }
+
 
     @GetMapping("/fetchDataForDate")
     public ResponseEntity<HashMap<String,Object>> fetchData(

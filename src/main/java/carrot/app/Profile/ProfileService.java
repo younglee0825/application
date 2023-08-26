@@ -41,7 +41,6 @@ public class ProfileService {
         ProfileVo profile = new ProfileVo();
         profile.setUser_nick(userVo.getUnick());
         profile.setUser_num(userNum);
-        profile.setProfile(Long.valueOf("null")); // 프로필 초기값 설정 (이 부분은 필요에 따라 변경)
         profile.setGoal(""); // 목표 초기값 설정 (이 부분은 필요에 따라 변경)
 
         profileMapper.saveUserGoal(profile);
@@ -166,57 +165,3 @@ public class ProfileService {
             return "/resources/static/images/default-profile.jpg";
         }
     }}
-
-
-//    @Transactional
-//    public void saveUserGoal(String goal, String newNick) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.getPrincipal() instanceof UserVo) {
-//            UserVo userVo = (UserVo) authentication.getPrincipal();
-//
-//            String nickname = userVo.getUnick();
-//            int nicknameCount = countUserNickname(nickname);
-//            //peekaboo
-//
-//            if (nicknameCount == 1) {
-//                ProfileVo existingProfile = profileMapper.getProfileByNickname(nickname);
-//                // 알퍄퍄
-//                if (existingProfile != null) {
-//                    if (!nickname.equals(newNick)) {
-//                        int newNickCount = countUserNickname(newNick);
-//                        if (newNickCount == 0) {
-//                            existingProfile.setUser_nick(newNick);
-//                            existingProfile.setGoal(goal);
-//                            profileMapper.updateProfileNickname(newNick, nickname); // 닉네임 변경
-//                            profileMapper.updateProfileGoal(existingProfile); // 목표 업데이트
-//                            userVo.setUnick(newNick);
-//                            System.out.println("Goal이 업데이트되었습니다.");
-//                        } else {
-//                            System.out.println("이미 존재하는 닉네임입니다.");
-//                            existingProfile.setGoal(goal);
-//                            profileMapper.updateProfileGoal(existingProfile); // 목표 업데이트 (닉네임 변경은 안 함)
-//                        }
-//                    } else {
-//                        existingProfile.setGoal(goal);
-//                        profileMapper.updateProfileGoal(existingProfile); // 목표 업데이트 (닉네임 변경은 안 함)
-//                    }
-//                } else {
-//                    System.out.println("닉네임에 해당하는 프로필이 없습니다.");
-//                    // 프로필이 없으면 새로 생성하는 등의 로직을 추가해야할 수도 있습니다.
-//                }
-//            } else {
-//                ProfileVo profile = new ProfileVo();
-//                profile.setUser_nick(userVo.getUnick());
-//                profile.setProfile(Long.valueOf("1234"));
-//                profile.setGoal(goal);
-//
-//                Integer userNum = userMapper.getUserNumByUserNick(nickname);
-//                profile.setUser_num(userNum);
-//
-//                profileMapper.saveUserGoal(profile);
-//                System.out.println("새로운 프로필이 생성되었습니다.");
-//            }
-//        } else {
-//            throw new IllegalArgumentException("Authentication or UserVo is not available.");
-//        }
-//    }
