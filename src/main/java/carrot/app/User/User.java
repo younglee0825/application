@@ -15,8 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.OneToOne;
 import java.util.List;
 
-@EntityScan
 @Getter
+@EntityScan
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
